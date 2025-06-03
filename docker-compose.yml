@@ -1,0 +1,29 @@
+# docker-compose.yml
+version: '3.8'
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: auto_journalist
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/auto_journalist
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TELEGRAM_TOKEN: ${TELEGRAM_TOKEN}
+      OUTPUT_DIR: /app/output
+      PUBLIC_DIR: /app/public
+    volumes:
+      - ./output:/app/output
+      - ./public:/app/public
+    command: sh -c "alembic upgrade head && python -m auto_journalist.main run_daily"
+
+volumes:
+  pgdata:
