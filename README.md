@@ -5,7 +5,7 @@ Auto-Journalist is a modular, multi-agent system that crawls news sources (inclu
 ## Features
 
 * **User Plans**: Basic (default sources) and Premium (add custom sources).
-* **Source Management**: `/listsources`, `/addsource <name> <url>`, `/removesource <url>`.
+* **Source Management**: `/listsources`, `/addsource <name> <url>`, `/removesource <url>` with inline prompts and default RSS suggestions.
 * **Preferences**: `/set <topic> <frequency>` (hourly, daily, weekly).
 * **Multi-Agent Pipeline**:
 
@@ -17,6 +17,23 @@ Auto-Journalist is a modular, multi-agent system that crawls news sources (inclu
   * **PublisherAgent**: Sends personalized messages to Telegram users.
 * **Dockerized**: Run everything in containers with `docker-compose`.
 * **Database**: PostgreSQL stores articles, summaries, fact-checks, commentary, users, preferences, and sources.
+* **Interactive Bot UI**: Telegram bot now uses inline buttons for plan selection, preferences, and source management.
+* **Tkinter GUI**: Optional desktop interface to manually trigger each agent.
+
+### Default News Sources
+
+The system comes preloaded with a pool of well known, high-impact news outlets:
+
+* BBC
+* CNN
+* Reuters
+* NYTimes
+* The Guardian
+* Al Jazeera
+* Associated Press
+* Washington Post
+* Wall Street Journal
+* The Economist
 
 ### Default News Sources
 
@@ -108,6 +125,15 @@ To generate charts summarizing article counts and fact-check results, run:
 python -m auto_journalist.main run_analytics
 ```
 
+This will:
+
+1. Crawl RSS & social feeds.
+2. Summarize new articles via OpenAI.
+3. Fact-check summaries via Wikipedia.
+4. Generate contextual commentary via OpenAI.
+5. Format and archive a Markdown/HTML newsletter in `output/` and `public/rss/`.
+6. Send personalized messages to Telegram users based on their topics and frequency.
+
 ### 6. Launch the Simple GUI
 
 Start the Tkinter-based interface to manually trigger agents or view analytics:
@@ -118,15 +144,6 @@ python -m auto_journalist.gui
 
 The GUI exposes an **Analytics** button to display the generated charts.
 
-This will:
-
-1. Crawl RSS & social feeds.
-2. Summarize new articles via OpenAI.
-3. Fact-check summaries via Wikipedia.
-4. Generate contextual commentary via OpenAI.
-5. Format and archive a Markdown/HTML newsletter in `output/` and `public/rss/`.
-6. Send personalized messages to Telegram users based on their topics and frequency.
-
 ### 7. Stream News to a Channel
 
 To stream every verified article to a Telegram channel as soon as it's processed, run:
@@ -134,7 +151,6 @@ To stream every verified article to a Telegram channel as soon as it's processed
 ```bash
 python -m auto_journalist.main run_stream
 ```
-
 ### 8. Automate Daily Runs
 
 #### A) Using Cron
