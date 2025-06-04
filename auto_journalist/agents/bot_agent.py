@@ -1,4 +1,3 @@
-import asyncio
 from telegram import (
     Update,
     Bot,
@@ -14,11 +13,11 @@ from telegram.ext import (
     ContextTypes,
     filters,
 )
-import sqlalchemy as sa
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from ..db import get_session
-from ..models import User, Preference, FrequencyEnum, PlanEnum, UserSource, Source
+from ..models import User, Preference, FrequencyEnum, PlanEnum, UserSource
 from .base_agent import BaseAgent
 from .source_manager_agent import SourceManagerAgent
 
@@ -56,7 +55,10 @@ class BotAgent(BaseAgent):
                     )
                 ],
                 ADD_SOURCE_URL: [
-                    MessageHandler(filters.TEXT & ~filters.COMMAND, self.add_source_url)
+                    MessageHandler(
+                        filters.TEXT & ~filters.COMMAND, self.add_source_url_text
+                    ),
+                    CallbackQueryHandler(self.add_source_url_callback),
                 ],
                 REMOVE_SOURCE_SELECT: [CallbackQueryHandler(self.remove_source_choice)],
             },
@@ -84,6 +86,22 @@ class BotAgent(BaseAgent):
         ]
         await bot.send_message(
             chat_id=chat_id, text=text, reply_markup=InlineKeyboardMarkup(keyboard)
+        )
+
+    async def prompt_source_url(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ) -> None:
+        """Send explanation about source URLs and present example options."""
+        from ..config import DEFAULT_SOURCES
+
+        buttons = [
+            [InlineKeyboardButton(src["name"], callback_data=src["url"])]
+            for src in DEFAULT_SOURCES
+        ]
+        buttons.append([InlineKeyboardButton("Custom URL", callback_data="custom")])
+        await update.message.reply_text(
+            "A source URL is typically an RSS feed link. Choose one below or select 'Custom URL' to provide your own:",
+            reply_markup=InlineKeyboardMarkup(buttons),
         )
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -198,7 +216,11 @@ class BotAgent(BaseAgent):
             tg_id = str(query.from_user.id)
             async for session in get_session():
                 result = await session.execute(
-                    select(User).where(User.telegram_id == tg_id)
+                    select(User)
+                    .options(
+                        selectinload(User.user_sources).selectinload(UserSource.source)
+                    )
+                    .where(User.telegram_id == tg_id)
                 )
                 user = result.scalar_one_or_none()
                 if not user or user.plan != PlanEnum.PREMIUM:
@@ -220,15 +242,30 @@ class BotAgent(BaseAgent):
 
     async def add_source_name(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["source_name"] = update.message.text
-        await update.message.reply_text("Send source URL:")
+        await self.prompt_source_url(update, context)
         return ADD_SOURCE_URL
 
-    async def add_source_url(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+    async def add_source_url_text(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
         context.user_data["source_url"] = update.message.text
         await self.add_source(update, context)
         await self._send_main_menu(
             update.effective_chat.id, context.bot, "Source added."
         )
+        return MAIN_MENU
+
+    async def add_source_url_callback(
+        self, update: Update, context: ContextTypes.DEFAULT_TYPE
+    ):
+        query = update.callback_query
+        await query.answer()
+        if query.data == "custom":
+            await query.message.reply_text("Please enter the source URL:")
+            return ADD_SOURCE_URL
+        context.user_data["source_url"] = query.data
+        await self.add_source(update, context)
+        await self._send_main_menu(query.message.chat_id, context.bot, "Source added.")
         return MAIN_MENU
 
     async def remove_source_choice(
@@ -395,7 +432,11 @@ class BotAgent(BaseAgent):
         tg_id = str(update.effective_user.id)
         async for session in get_session():
             result = await session.execute(
-                select(User).where(User.telegram_id == tg_id)
+                select(User)
+                .options(
+                    selectinload(User.user_sources).selectinload(UserSource.source)
+                )
+                .where(User.telegram_id == tg_id)
             )
             user = result.scalar_one_or_none()
 
