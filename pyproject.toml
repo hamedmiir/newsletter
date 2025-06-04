@@ -11,6 +11,7 @@ sqlalchemy = "^2.0"
 alembic = "^1.10.0"
 psycopg2-binary = "^2.9"
 requests = "^2.28"
+newspaper3k = "^0.2.8"
 jinja2 = "^3.1"
 markdown-it-py = "^2.2"
 python-dotenv = "^1.0"
@@ -21,6 +22,8 @@ apscheduler = "^3.10"
 python-telegram-bot = "^20.3"
 pytest = {extras = ["cov"], version = "^7.0"}
 vcrpy = "^4.0"
+matplotlib = "^3.8"
+pillow = "^10.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"

@@ -1,4 +1,3 @@
-import sqlalchemy as sa
 from sqlalchemy import select
 from ..db import get_session
 from ..models import Summary, FactCheck, FactStatusEnum
@@ -9,16 +8,16 @@ class FactCheckAgent(BaseAgent):
         super().__init__()
         self.model = model_name
 
-    async def fact_check(self, summary_text, summary_id):
+    async def fact_check(self, summary_text, summary_id=None):
         prompt = [
             {"role": "system", "content": "You are a fact-checking engine."},
             {
                 "role": "user",
                 "content": (
-                    "Check the following summary's key claims against reputable sources (e.g., Wikipedia). "
+                    "Check the following text against reputable sources such as Wikipedia. "
                     "Respond with a JSON object containing:\n"
-                    "{\"status\": \"verified\" | \"disputed\" | \"not_verifiable\", \"citations\": [...]}\n"
-                    f"Summary: {summary_text}"
+                    "{\"status\": \"verified\" | \"disputed\" | \"not_verifiable\", \"citations\": [...], \"analysis\": <short reason>}\n"
+                    f"Text: {summary_text}"
                 ),
             },
         ]
@@ -28,8 +27,13 @@ class FactCheckAgent(BaseAgent):
             max_tokens=200
         )
         if response is None:
-            self.logger.error(f"Marking FactCheck(summary_id={summary_id}) as NOT_VERIFIABLE due to OpenAI failure.")
-            return FactStatusEnum.NOT_VERIFIABLE, []
+            if summary_id is not None:
+                self.logger.error(
+                    f"Marking FactCheck(summary_id={summary_id}) as NOT_VERIFIABLE due to OpenAI failure."
+                )
+            else:
+                self.logger.error("Fact check failed due to OpenAI failure.")
+            return FactStatusEnum.NOT_VERIFIABLE, [], ""
 
         try:
             import json
@@ -37,11 +41,18 @@ class FactCheckAgent(BaseAgent):
             data = json.loads(payload)
             status_str = data.get("status", "not_verifiable")
             citations = data.get("citations", [])
+            analysis = data.get("analysis", "")
             status = FactStatusEnum(status_str)
-            return status, citations
+            return status, citations, analysis
         except Exception as e:
-            self.logger.error(f"Error parsing FactCheck response for summary_id={summary_id}: {e!r}")
-            return FactStatusEnum.NOT_VERIFIABLE, []
+            self.logger.error(
+                f"Error parsing FactCheck response for summary_id={summary_id}: {e!r}"
+            )
+            return FactStatusEnum.NOT_VERIFIABLE, [], ""
+
+    async def fact_check_text(self, text: str):
+        """Fact-check arbitrary user provided text or article."""
+        return await self.fact_check(text, None)
 
     async def run(self):
         async for session in get_session():
@@ -54,7 +65,7 @@ class FactCheckAgent(BaseAgent):
             summaries = result.scalars().all()
 
             for summary in summaries:
-                status, citations = await self.fact_check(summary.summary_text, summary.id)
+                status, citations, _ = await self.fact_check(summary.summary_text, summary.id)
                 fact = FactCheck(
                     summary_id=summary.id,
                     status=status,
@@ -63,3 +74,4 @@ class FactCheckAgent(BaseAgent):
                 session.add(fact)
 
             await session.commit()
+

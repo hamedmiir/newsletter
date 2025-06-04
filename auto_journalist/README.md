@@ -18,6 +18,21 @@ Auto-Journalist is a modular, multi-agent system that crawls news sources (inclu
 * **Dockerized**: Run everything in containers with `docker-compose`.
 * **Database**: PostgreSQL stores articles, summaries, fact-checks, commentary, users, preferences, and sources.
 
+### Default News Sources
+
+Our crawler loads a diverse set of well known outlets by default:
+
+* BBC
+* CNN
+* Reuters
+* NYTimes
+* The Guardian
+* Al Jazeera
+* Associated Press
+* Washington Post
+* Wall Street Journal
+* The Economist
+
 ## Quick Start (Local)
 
 ### 1. Clone & Configure
@@ -36,6 +51,8 @@ OPENAI_API_KEY=sk-your_openai_key
 TELEGRAM_TOKEN=123456789:ABCDEF...
 OUTPUT_DIR=output
 PUBLIC_DIR=public
+# Optional extra sources
+EXTRA_SOURCES="Reuters|http://feeds.reuters.com/reuters/topNews|False"
 ```
 
 ### 2. Install Dependencies
@@ -85,6 +102,12 @@ In another terminal, run the full daily pipeline:
 python -m auto_journalist.main run_daily
 ```
 
+To build charts summarizing article counts and fact-check distribution, run:
+
+```bash
+python -m auto_journalist.main run_analytics
+```
+
 This will:
 
 1. Crawl RSS & social feeds.
@@ -102,8 +125,17 @@ Start the Tkinter-based interface to manually trigger agents:
 python -m auto_journalist.gui
 ```
 
+The GUI includes an **Analytics** button that displays charts from `run_analytics`.
 
-### 7. Automate Daily Runs
+### 7. Stream News to a Channel
+
+Stream verified news items directly to a Telegram channel with:
+
+```bash
+python -m auto_journalist.main run_stream
+```
+
+### 8. Automate Daily Runs
 
 #### A) Using Cron
 
@@ -153,6 +185,18 @@ docker-compose run --rm app python -m auto_journalist.main run_daily
 * `/addsource <name> <url>` — (Premium only) Add a custom RSS/social source.
 * `/removesource <url>` — (Premium only) Remove a custom source.
 * `/listsources` — List default and your custom sources.
+* `/verify <url|text>` — Fact-check a news link or snippet.
+
+### What is a Source URL?
+
+A source URL is the address of an RSS feed or social feed that the crawler reads. Example feeds:
+
+```
+https://rss.cnn.com/rss/edition.rss
+https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+https://www.reddit.com/r/technology/.rss
+```
+Use `/addsource <name> <url>` to add any feed you like.
 * `/help` — Show this help message.
 
 ## Directory Structure

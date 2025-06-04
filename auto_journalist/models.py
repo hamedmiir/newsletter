@@ -159,3 +159,15 @@ class Issue(Base):
     filename_html = Column(String, nullable=False)
     filename_txt = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class StreamItem(Base):
+    __tablename__ = "stream_items"
+
+    id = Column(Integer, primary_key=True)
+    summary_id = Column(
+        Integer, ForeignKey("summaries.id"), nullable=False, unique=True
+    )
+    sent_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    summary = relationship("Summary")
