@@ -35,6 +35,21 @@ The system comes preloaded with a pool of well known, high-impact news outlets:
 * Wall Street Journal
 * The Economist
 
+### Default News Sources
+
+The system comes preloaded with a pool of well known, high-impact news outlets:
+
+* BBC
+* CNN
+* Reuters
+* NYTimes
+* The Guardian
+* Al Jazeera
+* Associated Press
+* Washington Post
+* Wall Street Journal
+* The Economist
+
 ## Quick Start (Local)
 
 ### 1. Clone & Configure
@@ -136,8 +151,6 @@ To stream every verified article to a Telegram channel as soon as it's processed
 ```bash
 python -m auto_journalist.main run_stream
 ```
-
-
 ### 8. Automate Daily Runs
 
 #### A) Using Cron

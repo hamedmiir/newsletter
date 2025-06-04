@@ -1,6 +1,7 @@
 import asyncio
 import threading
 import tkinter as tk
+import os
 from tkinter.scrolledtext import ScrolledText
 
 from .agents.orchestrator_agent import OrchestratorAgent
@@ -10,6 +11,7 @@ from .agents.factcheck_agent import FactCheckAgent
 from .agents.commentary_agent import CommentaryAgent
 from .agents.formatter_agent import FormatterAgent
 from .agents.publisher_agent import PublisherAgent
+from .agents.analytics_agent import AnalyticsAgent
 
 
 class AgentGUI:
@@ -39,6 +41,7 @@ class AgentGUI:
             side=tk.LEFT
         )
         tk.Button(frame, text="Publish", command=self.run_publisher).pack(side=tk.LEFT)
+        tk.Button(frame, text="Analytics", command=self.run_analytics).pack(side=tk.LEFT)
 
     def log(self, message: str) -> None:
         self.text.insert(tk.END, message + "\n")
@@ -83,6 +86,41 @@ class AgentGUI:
     def run_publisher(self):
         agent = PublisherAgent()
         self.run_async(agent.run)
+
+    def run_analytics(self):
+        agent = AnalyticsAgent()
+
+        def task():
+            self.log("Starting AnalyticsAgent.run()...")
+            try:
+                import asyncio
+                asyncio.run(agent.run())
+                self.log("Analytics generated in output/ directory.")
+                self.show_analytics()
+            except Exception as e:  # pragma: no cover - GUI diagnostic
+                self.log(f"Error: {e}")
+
+        threading.Thread(target=task, daemon=True).start()
+
+    def show_analytics(self):
+        try:
+            from PIL import Image, ImageTk
+        except Exception:
+            self.log("Pillow is required to display analytics charts.")
+            return
+
+        window = tk.Toplevel(self.master)
+        window.title("Analytics Dashboard")
+
+        for img_name in ["articles_per_source.png", "factchecks_per_source.png"]:
+            path = os.path.join("output", img_name)
+            if not os.path.exists(path):
+                continue
+            img = Image.open(path)
+            photo = ImageTk.PhotoImage(img)
+            label = tk.Label(window, image=photo)
+            label.image = photo
+            label.pack()
 
 
 def main() -> None:
