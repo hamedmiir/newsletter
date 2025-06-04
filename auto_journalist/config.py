@@ -51,3 +51,16 @@ def parse_extra_sources():
 def get_all_sources():
     """Return the combined list of default and extra sources."""
     return DEFAULT_SOURCES + parse_extra_sources()
+
+# Dedicated crypto market news feeds used by the optional crypto analysis
+# pipeline. These are a subset of popular crypto publications that provide
+# timely market news. They can be extended via user sources just like the
+# default list above.
+CRYPTO_SOURCES = [
+    {"name": "CoinDesk", "url": "https://www.coindesk.com/arc/outboundfeeds/rss/", "is_social": False},
+    {"name": "CoinTelegraph", "url": "https://cointelegraph.com/rss", "is_social": False},
+]
+
+# Telegram chat ID used when publishing crypto analysis. This should point to a
+# group or channel where the hourly crypto updates will be posted.
+CRYPTO_TELEGRAM_CHAT_ID = os.getenv("CRYPTO_TELEGRAM_CHAT_ID")

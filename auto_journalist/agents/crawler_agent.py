@@ -8,8 +8,9 @@ from ..db import get_session
 from ..models import Article, User, PlanEnum
 
 class CrawlerAgent(BaseAgent):
-    def __init__(self):
+    def __init__(self, sources=None):
         super().__init__()
+        self.sources_override = sources
 
     async def fetch_feed(self, url):
         return feedparser.parse(url)
@@ -18,8 +19,12 @@ class CrawlerAgent(BaseAgent):
         async for session in get_session():
             # Gather configured sources
             sources = []
-            from ..config import get_all_sources
-            for s in get_all_sources():
+            if self.sources_override is not None:
+                active_sources = self.sources_override
+            else:
+                from ..config import get_all_sources
+                active_sources = get_all_sources()
+            for s in active_sources:
                 sources.append({"name": s["name"], "url": s["url"]})
 
             # Add user‐specific sources for premium users
