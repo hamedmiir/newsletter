@@ -4,10 +4,12 @@ from .factcheck_agent import FactCheckAgent
 from .commentary_agent import CommentaryAgent
 from .formatter_agent import FormatterAgent
 from .publisher_agent import PublisherAgent
+from .news_stream_agent import NewsStreamAgent
 from .bot_agent import BotAgent
 from .base_agent import BaseAgent
 
 import os
+
 
 class OrchestratorAgent(BaseAgent):
     def __init__(self):
@@ -18,6 +20,7 @@ class OrchestratorAgent(BaseAgent):
         self.commentator = CommentaryAgent()
         self.formatter = FormatterAgent()
         self.publisher = PublisherAgent()
+        self.streamer = NewsStreamAgent()
 
         # The BotAgent requires the Telegram token from the environment
         telegram_token = os.getenv("TELEGRAM_TOKEN", "")
@@ -42,6 +45,14 @@ class OrchestratorAgent(BaseAgent):
         await self.publisher.run()
 
         # Close the shared OpenAI session (so no unclosed client session warnings)
+        await self.close()
+
+    async def run_stream(self):
+        """Fetch new articles and immediately publish them to the news stream."""
+        await self.crawler.run()
+        await self.summarizer.run()
+        await self.factchecker.run()
+        await self.streamer.run()
         await self.close()
 
     def run_bot(self):

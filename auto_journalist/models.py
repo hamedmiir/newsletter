@@ -41,9 +41,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     telegram_id = Column(String, unique=True, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    plan = Column(
-        SAEnum(PlanEnum, name="plan"), nullable=False, default=PlanEnum.BASIC
-    )
+    plan = Column(SAEnum(PlanEnum, name="plan"), nullable=False, default=PlanEnum.BASIC)
 
     preferences = relationship(
         "Preference", back_populates="user", cascade="all, delete-orphan"
@@ -121,10 +119,16 @@ class Summary(Base):
 
     article = relationship("Article", back_populates="summary")
     factcheck = relationship(
-        "FactCheck", back_populates="summary", uselist=False, cascade="all, delete-orphan"
+        "FactCheck",
+        back_populates="summary",
+        uselist=False,
+        cascade="all, delete-orphan",
     )
     commentary = relationship(
-        "Commentary", back_populates="summary", uselist=False, cascade="all, delete-orphan"
+        "Commentary",
+        back_populates="summary",
+        uselist=False,
+        cascade="all, delete-orphan",
     )
 
 
@@ -132,7 +136,9 @@ class FactCheck(Base):
     __tablename__ = "factchecks"
 
     id = Column(Integer, primary_key=True)
-    summary_id = Column(Integer, ForeignKey("summaries.id"), nullable=False, unique=True)
+    summary_id = Column(
+        Integer, ForeignKey("summaries.id"), nullable=False, unique=True
+    )
     status = Column(SAEnum(FactStatusEnum, name="factstatus"), nullable=False)
     citations = Column(JSONB, nullable=True)
     checked_at = Column(DateTime, default=datetime.utcnow, nullable=False)
@@ -144,7 +150,9 @@ class Commentary(Base):
     __tablename__ = "commentaries"
 
     id = Column(Integer, primary_key=True)
-    summary_id = Column(Integer, ForeignKey("summaries.id"), nullable=False, unique=True)
+    summary_id = Column(
+        Integer, ForeignKey("summaries.id"), nullable=False, unique=True
+    )
     commentary_text = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
@@ -159,3 +167,15 @@ class Issue(Base):
     filename_html = Column(String, nullable=False)
     filename_txt = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+
+class StreamItem(Base):
+    __tablename__ = "stream_items"
+
+    id = Column(Integer, primary_key=True)
+    summary_id = Column(
+        Integer, ForeignKey("summaries.id"), nullable=False, unique=True
+    )
+    sent_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    summary = relationship("Summary")

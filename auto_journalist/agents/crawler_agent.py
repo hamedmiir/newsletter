@@ -16,10 +16,10 @@ class CrawlerAgent(BaseAgent):
 
     async def run(self):
         async for session in get_session():
-            # Gather default sources
+            # Gather configured sources
             sources = []
-            from ..config import DEFAULT_SOURCES
-            for s in DEFAULT_SOURCES:
+            from ..config import get_all_sources
+            for s in get_all_sources():
                 sources.append({"name": s["name"], "url": s["url"]})
 
             # Add user‐specific sources for premium users
