@@ -94,7 +94,16 @@ This will:
 5. Format and archive a Markdown/HTML newsletter in `output/` and `public/rss/`.
 6. Send personalized messages to Telegram users based on their topics and frequency.
 
-### 6. Automate Daily Runs
+### 6. Launch the Simple GUI
+
+Start the Tkinter-based interface to manually trigger agents:
+
+```bash
+python -m auto_journalist.gui
+```
+
+
+### 7. Automate Daily Runs
 
 #### A) Using Cron
 
