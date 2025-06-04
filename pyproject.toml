@@ -19,6 +19,7 @@ newsapi-python = "^0.2"
 guardian = "^0.2.3"
 sendgrid = "^6.9"
 apscheduler = "^3.10"
+python-telegram-bot = "^20.3"
 pytest = {extras = ["cov"], version = "^7.0"}
 vcrpy = "^4.0"
 
