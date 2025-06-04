@@ -18,6 +18,21 @@ Auto-Journalist is a modular, multi-agent system that crawls news sources (inclu
 * **Dockerized**: Run everything in containers with `docker-compose`.
 * **Database**: PostgreSQL stores articles, summaries, fact-checks, commentary, users, preferences, and sources.
 
+### Default News Sources
+
+The system comes preloaded with a pool of well known, high-impact news outlets:
+
+* BBC
+* CNN
+* Reuters
+* NYTimes
+* The Guardian
+* Al Jazeera
+* Associated Press
+* Washington Post
+* Wall Street Journal
+* The Economist
+
 ## Quick Start (Local)
 
 ### 1. Clone & Configure
@@ -36,6 +51,8 @@ OPENAI_API_KEY=sk-your_openai_key
 TELEGRAM_TOKEN=123456789:ABCDEF...
 OUTPUT_DIR=output
 PUBLIC_DIR=public
+# Optional: add extra RSS sources
+EXTRA_SOURCES="Reuters|http://feeds.reuters.com/reuters/topNews|False"
 ```
 
 ### 2. Install Dependencies
@@ -84,6 +101,22 @@ In another terminal, run the full daily pipeline:
 ```bash
 python -m auto_journalist.main run_daily
 ```
+
+To generate charts summarizing article counts and fact-check results, run:
+
+```bash
+python -m auto_journalist.main run_analytics
+```
+
+### 6. Launch the Simple GUI
+
+Start the Tkinter-based interface to manually trigger agents or view analytics:
+
+```bash
+python -m auto_journalist.gui
+```
+
+The GUI exposes an **Analytics** button to display the generated charts.
 
 This will:
 

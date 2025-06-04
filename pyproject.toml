@@ -20,6 +20,8 @@ sendgrid = "^6.9"
 apscheduler = "^3.10"
 pytest = {extras = ["cov"], version = "^7.0"}
 vcrpy = "^4.0"
+matplotlib = "^3.8"
+pillow = "^10.0"
 
 [tool.poetry.dev-dependencies]
 black = "^23.3.0"

@@ -2,6 +2,7 @@ import asyncio
 import click
 import logging
 from .agents.orchestrator_agent import OrchestratorAgent
+from .agents.analytics_agent import AnalyticsAgent
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,6 +22,13 @@ def run_daily():
 def run_bot():
     orchestrator = OrchestratorAgent()
     orchestrator.run_bot()
+
+
+@cli.command()
+def run_analytics():
+    """Generate analytics charts from stored data."""
+    agent = AnalyticsAgent()
+    asyncio.run(agent.run())
 
 if __name__ == '__main__':
     cli()
