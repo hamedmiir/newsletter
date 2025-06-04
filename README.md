@@ -144,6 +144,18 @@ docker-compose run --rm app python -m auto_journalist.main run_daily
 * `/addsource <name> <url>` — (Premium only) Add a custom RSS/social source.
 * `/removesource <url>` — (Premium only) Remove a custom source.
 * `/listsources` — List default and your custom sources.
+* `/verify <url|text>` — Fact-check a news link or snippet.
+
+### What is a Source URL?
+
+A source URL is the address of an RSS feed or social feed that the crawler reads. Examples include RSS feeds from major news websites or subreddit feeds such as:
+
+```
+https://rss.cnn.com/rss/edition.rss
+https://rss.nytimes.com/services/xml/rss/nyt/World.xml
+https://www.reddit.com/r/technology/.rss
+```
+Use `/addsource <name> <url>` to add any feed you like.
 * `/help` — Show this help message.
 
 ## Directory Structure
