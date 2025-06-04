@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from pathlib import Path
 from jinja2 import Environment, FileSystemLoader
 import markdown_it
 import sqlalchemy as sa
@@ -9,8 +10,9 @@ from ..models import Summary, FactCheck, Commentary, Issue
 
 class FormatterAgent:
     def __init__(self):
+        templates_dir = Path(__file__).resolve().parent.parent / "templates"
         self.env = Environment(
-            loader=FileSystemLoader(searchpath=os.path.join(os.getcwd(), "auto_journalist", "templates"))
+            loader=FileSystemLoader(searchpath=str(templates_dir))
         )
         self.md = markdown_it.MarkdownIt()
 
