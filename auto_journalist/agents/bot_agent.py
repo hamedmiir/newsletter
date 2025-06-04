@@ -17,11 +17,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
 from ..db import get_session
-from ..models import User, Preference, FrequencyEnum, PlanEnum, UserSource, Source
+from ..models import User, Preference, FrequencyEnum, PlanEnum, UserSource
 from .base_agent import BaseAgent
 from .source_manager_agent import SourceManagerAgent
 
-from .factcheck_agent import FactCheckAgent
 (
     MAIN_MENU,
     PLAN_MENU,
@@ -177,7 +176,6 @@ class BotAgent(BaseAgent):
             )
             return MAIN_MENU
         return PLAN_MENU
-
     async def pref_topic(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["topic"] = update.message.text
         keyboard = [
@@ -241,7 +239,6 @@ class BotAgent(BaseAgent):
             )
             return REMOVE_SOURCE_SELECT
         return MANAGE_MENU
-
     async def add_source_name(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["source_name"] = update.message.text
         await self.prompt_source_url(update, context)
@@ -445,7 +442,6 @@ class BotAgent(BaseAgent):
                 return
 
             from ..config import DEFAULT_SOURCES
-
             default_list = [f"{s['name']} - {s['url']}" for s in DEFAULT_SOURCES]
 
             stmt = (
