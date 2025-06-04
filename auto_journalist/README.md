@@ -117,6 +117,7 @@ This will:
 5. Format and archive a Markdown/HTML newsletter in `output/` and `public/rss/`.
 6. Send personalized messages to Telegram users based on their topics and frequency.
 
+
 ### 6. Launch the Simple GUI
 
 Start the Tkinter-based interface to manually trigger agents:
@@ -127,9 +128,16 @@ python -m auto_journalist.gui
 
 The GUI includes an **Analytics** button that displays charts from `run_analytics`.
 
+### 7. Stream News to a Channel
 
-### 7. Automate Daily Runs
 
+Stream verified news items directly to a Telegram channel with:
+
+```bash
+python -m auto_journalist.main run_stream
+```
+
+### 8. Automate Daily Runs
 #### A) Using Cron
 
 Add to your crontab (`crontab -e`):

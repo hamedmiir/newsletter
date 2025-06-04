@@ -127,7 +127,15 @@ This will:
 5. Format and archive a Markdown/HTML newsletter in `output/` and `public/rss/`.
 6. Send personalized messages to Telegram users based on their topics and frequency.
 
-### 6. Automate Daily Runs
+### 7. Stream News to a Channel
+
+To stream every verified article to a Telegram channel as soon as it's processed, run:
+
+```bash
+python -m auto_journalist.main run_stream
+```
+
+### 8. Automate Daily Runs
 
 #### A) Using Cron
 

@@ -1,10 +1,12 @@
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
+NEWS_STREAM_CHANNEL_ID = os.getenv('NEWS_STREAM_CHANNEL_ID')
 OUTPUT_DIR = os.getenv('OUTPUT_DIR', 'output')
 PUBLIC_DIR = os.getenv('PUBLIC_DIR', 'public')
 

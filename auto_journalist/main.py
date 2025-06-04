@@ -9,14 +9,17 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s [%(name)s] %(message)s",
 )
 
+
 @click.group()
 def cli():
     pass
+
 
 @cli.command()
 def run_daily():
     orchestrator = OrchestratorAgent()
     asyncio.run(orchestrator.run_daily())
+
 
 @cli.command()
 def run_bot():
@@ -25,10 +28,16 @@ def run_bot():
 
 
 @cli.command()
+def run_stream():
+    orchestrator = OrchestratorAgent()
+    asyncio.run(orchestrator.run_stream())
+
+
+@cli.command()
 def run_analytics():
     """Generate analytics charts from stored data."""
     agent = AnalyticsAgent()
     asyncio.run(agent.run())
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     cli()
