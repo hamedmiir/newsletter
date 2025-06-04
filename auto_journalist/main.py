@@ -39,6 +39,5 @@ def run_analytics():
     agent = AnalyticsAgent()
     asyncio.run(agent.run())
 
-
 if __name__ == "__main__":
     cli()

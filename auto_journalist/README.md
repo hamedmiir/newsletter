@@ -130,6 +130,7 @@ The GUI includes an **Analytics** button that displays charts from `run_analytic
 
 ### 7. Stream News to a Channel
 
+
 Stream verified news items directly to a Telegram channel with:
 
 ```bash
